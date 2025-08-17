@@ -1,0 +1,308 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Animation utilities */
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Mobile-first optimizations */
+@media (max-width: 640px) {
+  .mobile-vh {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+}
+
+/* Smooth scrolling and touch optimizations */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Touch optimizations */
+button, .btn {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Backdrop blur fallback */
+@supports not (backdrop-filter: blur(10px)) {
+  .backdrop-blur-sm {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(0, 0%, 1.2%);
+  --card: hsl(0, 0%, 97.6%);
+  --card-foreground: hsl(0, 0%, 1.2%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(0, 0%, 1.2%);
+  --primary: hsl(0, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(214, 100%, 41%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(0, 0%, 97.6%);
+  --muted-foreground: hsl(0, 0%, 37.6%);
+  --accent: hsl(0, 0%, 97.6%);
+  --accent-foreground: hsl(0, 100%, 50%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 89.8%);
+  --input: hsl(0, 0%, 89.8%);
+  --ring: hsl(0, 100%, 50%);
+  --chart-1: hsl(0, 100%, 50%);
+  --chart-2: hsl(214, 100%, 41%);
+  --chart-3: hsl(45, 93%, 47%);
+  --chart-4: hsl(120, 61%, 50%);
+  --chart-5: hsl(300, 76%, 72%);
+  --sidebar: hsl(0, 0%, 97.6%);
+  --sidebar-foreground: hsl(0, 0%, 1.2%);
+  --sidebar-primary: hsl(0, 100%, 50%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(0, 0%, 97.6%);
+  --sidebar-accent-foreground: hsl(0, 100%, 50%);
+  --sidebar-border: hsl(0, 0%, 89.8%);
+  --sidebar-ring: hsl(0, 100%, 50%);
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: 'Courier New', monospace;
+  --radius: 0.75rem;
+  --youtube-red: hsl(0, 100%, 50%);
+  --youtube-blue: hsl(214, 100%, 41%);
+  --gray-light: hsl(0, 0%, 97.6%);
+  --text-primary: hsl(0, 0%, 1.2%);
+  --text-secondary: hsl(0, 0%, 37.6%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --popover: hsl(0, 0%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --primary: hsl(0, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(214, 100%, 41%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 14.9%);
+  --muted-foreground: hsl(0, 0%, 63.9%);
+  --accent: hsl(0, 0%, 14.9%);
+  --accent-foreground: hsl(0, 100%, 50%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 14.9%);
+  --input: hsl(0, 0%, 14.9%);
+  --ring: hsl(0, 100%, 50%);
+  --chart-1: hsl(0, 100%, 50%);
+  --chart-2: hsl(214, 100%, 41%);
+  --chart-3: hsl(45, 93%, 47%);
+  --chart-4: hsl(120, 61%, 50%);
+  --chart-5: hsl(300, 76%, 72%);
+  --sidebar: hsl(0, 0%, 3.9%);
+  --sidebar-foreground: hsl(0, 0%, 98%);
+  --sidebar-primary: hsl(0, 100%, 50%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(0, 0%, 14.9%);
+  --sidebar-accent-foreground: hsl(0, 100%, 50%);
+  --sidebar-border: hsl(0, 0%, 14.9%);
+  --sidebar-ring: hsl(0, 100%, 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* YouTube-inspired custom styles */
+.youtube-red {
+  background-color: var(--youtube-red);
+}
+
+.youtube-blue {
+  background-color: var(--youtube-blue);
+}
+
+.text-youtube-red {
+  color: var(--youtube-red);
+}
+
+.text-youtube-blue {
+  color: var(--youtube-blue);
+}
+
+.bg-youtube-red {
+  background-color: var(--youtube-red);
+}
+
+.bg-youtube-blue {
+  background-color: var(--youtube-blue);
+}
+
+.hover\:bg-youtube-red:hover {
+  background-color: hsl(0, 100%, 45%);
+}
+
+.hover\:bg-youtube-blue:hover {
+  background-color: hsl(214, 100%, 36%);
+}
+
+.border-youtube-red {
+  border-color: var(--youtube-red);
+}
+
+.border-youtube-blue {
+  border-color: var(--youtube-blue);
+}
+
+/* Custom button styles for better contrast */
+.btn-youtube-red {
+  background-color: var(--youtube-red);
+  color: white;
+  border: 1px solid var(--youtube-red);
+}
+
+.btn-youtube-red:hover {
+  background-color: hsl(0, 100%, 45%);
+  border-color: hsl(0, 100%, 45%);
+}
+
+.btn-youtube-blue {
+  background-color: var(--youtube-blue);
+  color: white;
+  border: 1px solid var(--youtube-blue);
+}
+
+.btn-youtube-blue:hover {
+  background-color: hsl(214, 100%, 36%);
+  border-color: hsl(214, 100%, 36%);
+}
+
+/* Ensure proper text contrast on colored backgrounds */
+.bg-red-600, .bg-red-500, .bg-youtube-red {
+  color: white;
+}
+
+.bg-blue-600, .bg-blue-500, .bg-youtube-blue {
+  color: white;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 97.6%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(0, 0%, 80%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 70%);
+}
