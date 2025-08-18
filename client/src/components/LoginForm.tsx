@@ -20,9 +20,10 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
+  onSwitchToSetPassword?: () => void;
 }
 
-export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
+export default function LoginForm({ onSwitchToRegister, onSwitchToSetPassword }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -51,10 +52,27 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
       reset();
     },
     onError: (error: any) => {
+      let description = error.message || "Invalid credentials. Please try again.";
+      let actions = undefined;
+
+      // Check if this is a Google account that needs a password
+      if (error.code === 'GOOGLE_ACCOUNT' && onSwitchToSetPassword) {
+        description = error.message;
+        actions = (
+          <button
+            onClick={onSwitchToSetPassword}
+            className="text-emerald-400 hover:text-emerald-300 font-semibold underline"
+          >
+            Set password now
+          </button>
+        );
+      }
+
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid credentials. Please try again.",
+        description,
         variant: "destructive",
+        action: actions,
       });
     },
   });
@@ -68,7 +86,7 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold text-white">Sign In</CardTitle>
         <CardDescription className="text-gray-400">
-          Welcome back! Enter your credentials to continue.
+          Welcome back! Sign in with your email and password.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -141,7 +159,7 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-3">
           <p className="text-gray-400">
             Don't have an account?{" "}
             <button
@@ -152,6 +170,19 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
               Sign up now
             </button>
           </p>
+          
+          {onSwitchToSetPassword && (
+            <p className="text-gray-400 text-sm">
+              Have a Google account but need a password?{" "}
+              <button
+                onClick={onSwitchToSetPassword}
+                className="text-blue-400 hover:text-blue-300 font-semibold"
+                data-testid="link-set-password"
+              >
+                Set password
+              </button>
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

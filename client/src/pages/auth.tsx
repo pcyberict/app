@@ -2,10 +2,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoginForm from "@/components/LoginForm";
 import RegisterForm from "@/components/RegisterForm";
+import SetPasswordForm from "@/components/SetPasswordForm";
 import { Youtube } from "lucide-react";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'setPassword'>('login');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
@@ -59,7 +60,7 @@ export default function AuthPage() {
           {/* Right side - Auth Forms */}
           <div className="flex justify-center">
             <AnimatePresence mode="wait">
-              {isLogin ? (
+              {authMode === 'login' ? (
                 <motion.div
                   key="login"
                   initial={{ opacity: 0, x: 20 }}
@@ -68,9 +69,12 @@ export default function AuthPage() {
                   transition={{ duration: 0.3 }}
                   className="w-full"
                 >
-                  <LoginForm onSwitchToRegister={() => setIsLogin(false)} />
+                  <LoginForm 
+                    onSwitchToRegister={() => setAuthMode('register')}
+                    onSwitchToSetPassword={() => setAuthMode('setPassword')}
+                  />
                 </motion.div>
-              ) : (
+              ) : authMode === 'register' ? (
                 <motion.div
                   key="register"
                   initial={{ opacity: 0, x: 20 }}
@@ -79,7 +83,18 @@ export default function AuthPage() {
                   transition={{ duration: 0.3 }}
                   className="w-full"
                 >
-                  <RegisterForm onSwitchToLogin={() => setIsLogin(true)} />
+                  <RegisterForm onSwitchToLogin={() => setAuthMode('login')} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="setPassword"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full"
+                >
+                  <SetPasswordForm onSwitchToLogin={() => setAuthMode('login')} />
                 </motion.div>
               )}
             </AnimatePresence>

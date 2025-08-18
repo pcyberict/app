@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import { paymentConfig } from "./paymentConfig";
 import fetch from "node-fetch";
 import { setupWebSocket, setSocketIO, broadcastDatabaseChange } from "./websocket";
+import bcrypt from "bcryptjs";
 
 // Utility function to generate unique order IDs
 function generateOrderId(): string {
@@ -106,7 +107,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Hash password
-      const bcrypt = require('bcryptjs');
       const passwordHash = await bcrypt.hash(password, 10);
 
       // Create user
@@ -147,15 +147,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Find user by email
       const user = await storage.getUserByEmail(email);
-      if (!user || !user.passwordHash) {
+      if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      // Check password
-      const bcrypt = require('bcryptjs');
-      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-      if (!isValidPassword) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+      // Check if user has password hash (traditional auth)
+      if (user.passwordHash) {
+        // Check password
+        const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+        if (!isValidPassword) {
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+      } else {
+        // User exists but doesn't have password - this is a Google OAuth user trying to sign in with password
+        return res.status(401).json({ 
+          message: 'This account was created with Google. Please sign in with Google or set a password first.',
+          code: 'GOOGLE_ACCOUNT'
+        });
       }
 
       // Check if user is banned or suspended
@@ -181,6 +189,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: 'Logout successful' });
     });
+  });
+
+  // Set password for existing users (like Google OAuth users)
+  app.post('/api/auth/set-password', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // Validate required fields
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Check if user already has a password
+      if (user.passwordHash) {
+        return res.status(400).json({ message: 'User already has a password. Use login instead.' });
+      }
+
+      // Hash password
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // Update user with password
+      await storage.updateUserProfile(user.id, { passwordHash });
+
+      // Set session
+      (req as any).session.userId = user.id;
+
+      res.json({ message: 'Password set successfully. You are now logged in.' });
+    } catch (error: any) {
+      console.error('Set password error:', error);
+      res.status(500).json({ message: 'Failed to set password' });
+    }
   });
 
   // Auth routes
