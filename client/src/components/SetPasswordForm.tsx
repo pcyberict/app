@@ -52,11 +52,10 @@ export default function SetPasswordForm({ onSwitchToLogin }: SetPasswordFormProp
   const password = watch("password", "");
 
   const setPasswordMutation = useMutation({
-    mutationFn: (data: Omit<SetPasswordFormData, "confirmPassword">) =>
-      apiRequest("/api/auth/set-password", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+    mutationFn: async (data: Omit<SetPasswordFormData, "confirmPassword">) => {
+      const response = await apiRequest("POST", "/api/auth/set-password", data);
+      return response.json();
+    },
     onSuccess: () => {
       toast({
         title: "Password Set Successfully!",

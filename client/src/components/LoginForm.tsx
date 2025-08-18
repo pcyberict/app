@@ -37,11 +37,10 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   });
 
   const loginMutation = useMutation({
-    mutationFn: (data: LoginFormData) =>
-      apiRequest("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+    mutationFn: async (data: LoginFormData) => {
+      const response = await apiRequest("POST", "/api/auth/login", data);
+      return response.json();
+    },
     onSuccess: () => {
       toast({
         title: "Welcome back!",

@@ -57,11 +57,10 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const password = watch("password", "");
 
   const registerMutation = useMutation({
-    mutationFn: (data: Omit<RegisterFormData, "confirmPassword">) =>
-      apiRequest("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+    mutationFn: async (data: Omit<RegisterFormData, "confirmPassword">) => {
+      const response = await apiRequest("POST", "/api/auth/register", data);
+      return response.json();
+    },
     onSuccess: () => {
       toast({
         title: "Account Created!",
