@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
+import AuthPage from "@/pages/auth";
 import Dashboard from "@/pages/dashboard";
 import WatchQueue from "@/pages/watch-queue";
 import SubmitVideo from "@/pages/submit-video";
@@ -107,7 +108,7 @@ function Router() {
       <Route path="/maintenance" component={MaintenancePage} />
 
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <Route path="/" component={AuthPage} />
       ) : (
         <>
           <Route path="/streaming" component={StreamingNative} />

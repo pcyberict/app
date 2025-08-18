@@ -179,10 +179,25 @@ export function setupGoogleAuth(app: Express) {
 }
 
 // Middleware to check if user is authenticated
-export function requireAuth(req: any, res: any, next: any) {
-  if (req.user) {
-    next();
-  } else {
-    res.status(401).json({ message: 'Unauthorized' });
+export async function requireAuth(req: any, res: any, next: any) {
+  try {
+    // Check for session-based authentication first
+    if (req.session?.userId) {
+      const user = await storage.getUser(req.session.userId);
+      if (user) {
+        req.user = user;
+        return next();
+      }
+    }
+
+    // Check for Passport-based Google OAuth authentication
+    if (req.user) {
+      return next();
+    }
+
+    return res.status(401).json({ message: "Unauthorized" });
+  } catch (error) {
+    console.error("Authentication error:", error);
+    return res.status(401).json({ message: "Unauthorized" });
   }
 }

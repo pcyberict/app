@@ -59,6 +59,7 @@ export interface IStorage {
   updateUserProfile(userId: string, updates: Partial<User>): Promise<User>;
   getAllUsers(): Promise<User[]>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: Partial<User>): Promise<User>;
   
   // Video operations
@@ -268,11 +269,18 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
   async createUser(userData: Partial<User>): Promise<User> {
     const [user] = await db
       .insert(users)
       .values({
+        username: userData.username,
         email: userData.email!,
+        passwordHash: userData.passwordHash,
         firstName: userData.firstName,
         lastName: userData.lastName,
         role: userData.role || 'user',
@@ -712,6 +720,10 @@ export class MemStorageWithReferrals implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.email === email);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.username === username);
   }
 
   async createUser(userData: any): Promise<User> {

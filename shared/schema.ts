@@ -29,7 +29,9 @@ export const sessions = pgTable(
 // (IMPORTANT) This table is mandatory for Replit Auth, don't drop it.
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: varchar("username").unique(),
   email: varchar("email").unique(),
+  passwordHash: text("password_hash"),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -38,7 +40,7 @@ export const users = pgTable("users", {
   country: varchar("country"),
   role: varchar("role").default("user"), // user, moderator, admin
   status: varchar("status").default("active"), // active, banned, suspended
-  coinsBalance: integer("coins_balance").default(60), // Start with 60 coins welcome bonus
+  coinsBalance: integer("coins_balance").default(1000), // Start with 1000 coins welcome bonus
   referralCode: varchar("referral_code").unique(),
   referredBy: varchar("referred_by"),
   welcomeBonusReceived: boolean("welcome_bonus_received").default(false),

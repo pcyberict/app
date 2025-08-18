@@ -83,6 +83,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('System settings already exist or error initializing:', error);
   }
 
+  // Traditional auth routes
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+
+      // Validate required fields
+      if (!username || !email || !password) {
+        return res.status(400).json({ message: 'Username, email, and password are required' });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: 'User with this email already exists' });
+      }
+
+      // Check if username is taken
+      const existingUsername = await storage.getUserByUsername(username);
+      if (existingUsername) {
+        return res.status(400).json({ message: 'Username is already taken' });
+      }
+
+      // Hash password
+      const bcrypt = require('bcryptjs');
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // Create user
+      const newUser = await storage.createUser({
+        username,
+        email,
+        passwordHash,
+        coinsBalance: 1000, // Welcome bonus
+        welcomeBonusReceived: true,
+      });
+
+      // Create welcome bonus transaction
+      await storage.createTransaction({
+        userId: newUser.id,
+        type: 'welcome_bonus',
+        amount: 1000,
+        reason: 'Welcome bonus for new account',
+      });
+
+      // Set session
+      (req as any).session.userId = newUser.id;
+      
+      res.json({ user: newUser, message: 'Account created successfully' });
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      res.status(500).json({ message: 'Failed to create account' });
+    }
+  });
+
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // Validate required fields
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+      }
+
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user || !user.passwordHash) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      // Check password
+      const bcrypt = require('bcryptjs');
+      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      // Check if user is banned or suspended
+      if (user.status !== 'active') {
+        return res.status(403).json({ message: `Account is ${user.status}` });
+      }
+
+      // Set session
+      (req as any).session.userId = user.id;
+      
+      res.json({ user, message: 'Login successful' });
+    } catch (error: any) {
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Login failed' });
+    }
+  });
+
+  app.post('/api/auth/logout', (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.json({ message: 'Logout successful' });
+    });
+  });
+
   // Auth routes
   app.get('/api/auth/user', requireAuth, async (req: any, res) => {
     try {
