@@ -2,11 +2,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoginForm from "@/components/LoginForm";
 import RegisterForm from "@/components/RegisterForm";
-import SetPasswordForm from "@/components/SetPasswordForm";
+// SetPasswordForm removed with Google OAuth
 import { Youtube } from "lucide-react";
 
 export default function AuthPage() {
-  const [authMode, setAuthMode] = useState<'login' | 'register' | 'setPassword'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
@@ -71,7 +71,6 @@ export default function AuthPage() {
                 >
                   <LoginForm 
                     onSwitchToRegister={() => setAuthMode('register')}
-                    onSwitchToSetPassword={() => setAuthMode('setPassword')}
                   />
                 </motion.div>
               ) : authMode === 'register' ? (
@@ -85,18 +84,7 @@ export default function AuthPage() {
                 >
                   <RegisterForm onSwitchToLogin={() => setAuthMode('login')} />
                 </motion.div>
-              ) : (
-                <motion.div
-                  key="setPassword"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full"
-                >
-                  <SetPasswordForm onSwitchToLogin={() => setAuthMode('login')} />
-                </motion.div>
-              )}
+              ) : null}
             </AnimatePresence>
           </div>
         </div>

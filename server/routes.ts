@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupGoogleAuth, requireAuth } from "./googleAuth";
+import { requireAuth } from "./auth";
 import { setupAdminAuth, requireAdminAuth } from "./adminAuth";
 import { insertVideoSchema, insertTransactionSchema, insertVideoReportSchema, insertSystemSettingSchema } from "@shared/schema";
 import Stripe from "stripe";
@@ -43,7 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setSocketIO(io);
   
   // Setup Google OAuth authentication
-  setupGoogleAuth(app);
+  // Google OAuth removed as requested by user
   
   // Setup admin authentication
   setupAdminAuth(app);
@@ -53,13 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ requireAuth: req.session?.adminId !== undefined });
   });
 
-  // Google OAuth config endpoint for frontend
-  app.get('/api/google-config', (req, res) => {
-    res.json({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      apiKey: process.env.YOUTUBE_API_KEY || ''
-    });
-  });
+  // Google OAuth config removed as requested by user
 
   // Admin logout endpoint
   app.post('/api/admin/logout', (req: any, res) => {
@@ -138,15 +132,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/auth/login', async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { emailOrUsername, email, password } = req.body;
+      const loginField = emailOrUsername || email; // Support both formats
 
       // Validate required fields
-      if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
+      if (!loginField || !password) {
+        return res.status(400).json({ message: 'Email or username and password are required' });
       }
 
-      // Find user by email
-      const user = await storage.getUserByEmail(email);
+      // Find user by email or username
+      let user = null;
+      if (loginField.includes('@')) {
+        user = await storage.getUserByEmail(loginField);
+      } else {
+        user = await storage.getUserByUsername(loginField);
+      }
+      
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }

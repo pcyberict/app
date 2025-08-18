@@ -12,18 +12,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Eye, EyeOff, LogIn, Mail, Lock } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  emailOrUsername: z.string().min(1, "Email or username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
-  onSwitchToSetPassword?: () => void;
 }
 
-export default function LoginForm({ onSwitchToRegister, onSwitchToSetPassword }: LoginFormProps) {
+export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -50,23 +49,14 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToSetPassword }:
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       reset();
+      // Redirect to main page
+      window.location.href = '/';
     },
     onError: (error: any) => {
       let description = error.message || "Invalid credentials. Please try again.";
       let actions = undefined;
 
-      // Check if this is a Google account that needs a password
-      if (error.code === 'GOOGLE_ACCOUNT' && onSwitchToSetPassword) {
-        description = error.message;
-        actions = (
-          <button
-            onClick={onSwitchToSetPassword}
-            className="text-emerald-400 hover:text-emerald-300 font-semibold underline"
-          >
-            Set password now
-          </button>
-        );
-      }
+      // Google OAuth removed - simplified error handling
 
       toast({
         title: "Login Failed",
@@ -92,22 +82,22 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToSetPassword }:
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-200">
-              Email
+            <Label htmlFor="emailOrUsername" className="text-gray-200">
+              Email or Username
             </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                {...register("email")}
-                id="email"
-                type="email"
-                placeholder="Enter your email"
+                {...register("emailOrUsername")}
+                id="emailOrUsername"
+                type="text"
+                placeholder="Enter email or username"
                 className="pl-10 bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-emerald-500"
-                data-testid="input-email"
+                data-testid="input-email-username"
               />
             </div>
-            {errors.email && (
-              <p className="text-sm text-red-400">{errors.email.message}</p>
+            {errors.emailOrUsername && (
+              <p className="text-sm text-red-400">{errors.emailOrUsername.message}</p>
             )}
           </div>
 
@@ -171,18 +161,7 @@ export default function LoginForm({ onSwitchToRegister, onSwitchToSetPassword }:
             </button>
           </p>
           
-          {onSwitchToSetPassword && (
-            <p className="text-gray-400 text-sm">
-              Have a Google account but need a password?{" "}
-              <button
-                onClick={onSwitchToSetPassword}
-                className="text-blue-400 hover:text-blue-300 font-semibold"
-                data-testid="link-set-password"
-              >
-                Set password
-              </button>
-            </p>
-          )}
+
         </div>
       </CardContent>
     </Card>

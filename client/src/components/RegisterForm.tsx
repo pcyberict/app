@@ -69,6 +69,8 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       reset();
+      // Redirect to main page
+      window.location.href = '/';
     },
     onError: (error: any) => {
       toast({
